@@ -12,7 +12,6 @@ import styles from './ui.module.less';
 import enUS from './locales/en-US';
 import zhCN from './locales/zh-CN';
 import model from './model';
-
 export default (api: IUiApi) => {
   initApiToGloal(api);
 

@@ -612,6 +612,7 @@ export default class UmiUI {
   // reloadProject(key: string) {}
 
   async handleCoreData({ type, payload, lang, key }, { log, send, success, failure, progress }) {
+    console.log('调用相关执行', type, payload, lang, key )
     switch (type) {
       case '@@project/getBasicAssets':
         success(this.getBasicAssets());
@@ -890,14 +891,14 @@ export default class UmiUI {
     const { browser, full = false } = opts || {};
     this.ctx.full = full;
     this.ctx.browser = browser;
-
+// @ts-ignore
     return new Promise(async (resolve, reject) => {
       console.log(`🚀 Starting Umi UI using umi@${process.env.UMI_VERSION}...`);
 
       const app = express();
       app.use(compression());
       // Serve Static (Production Only)
-      if (!process.env.LOCAL_DEBUG) {
+      if (process.env.LOCAL_DEBUG) {
         app.use(
           express.static(join(__dirname, '..', 'web/dist'), {
             index: false,
@@ -907,7 +908,7 @@ export default class UmiUI {
       /**
        * Terminal shell resize server
        */
-      app.get('/terminal/resize', resizeRoute(this.ctx));
+      app.get('/terminal/resize', resizeRoute(this.ctx)); // 更改命令终端的行与列
       // 访问域名打开
       app.get('/', indexRoute(this.ctx));
       app.use('/*', commonRoute(this.ctx));
@@ -919,7 +920,7 @@ export default class UmiUI {
         const message = JSON.stringify(action);
         debugSocket(chalk.green.bold('>>>>'), formatLogMessage(message));
         Object.keys(conns).forEach(id => {
-          conns[id].write(message);
+          conns[id].write(message); // 服务端发送错误信息给客户端
         });
       }
 
@@ -936,12 +937,15 @@ export default class UmiUI {
         conns[conn.id] = conn;
         debugSocket(`🔗 ${chalk.green('Connected to')}: ${conn.id}`);
         function success(type, payload) {
+          console.log('success 成功提示', type , payload)
           send({ type: `${type}/success`, payload });
         }
         function failure(type, payload) {
+            console.log('failure 失败提示', type , payload)
           send({ type: `${type}/failure`, payload });
         }
         function progress(type, payload) {
+            console.log('执行中', type , payload)
           send({ type: `${type}/progress`, payload });
         }
 
@@ -956,6 +960,7 @@ export default class UmiUI {
             message,
           };
           const msg = `${chalk.gray(`[${type}]`)} ${message}`;
+          console.log('回传日志信息', msg)
           const logFunc = type === 'error' ? console.error : debugSocket;
           logFunc(msg);
           this.logs.push(payload);
@@ -970,6 +975,7 @@ export default class UmiUI {
           delete conns[conn.id];
         });
         conn.on('data', async message => {
+            console.log('接收客户端的消息，', message)
           try {
             const { type, payload, $lang: lang, $key: key } = JSON.parse(message);
             debugSocket(chalk.blue.bold('<<<<'), formatLogMessage(message));
@@ -1032,7 +1038,7 @@ export default class UmiUI {
           const [command] = process.argv.slice(2);
           const url = `http://localhost:${port}/`;
           console.log(
-            command === 'dev' ? `🌈 Umi UI mini Ready on port 3000.` : `⛽️ Ready on ${url}.`,
+            command === 'dev' ? `🌈 Umi UI mini Ready on port 3000.` : `⛽ Ready on ${url}.`,
           );
           if (browser) {
             openBrowser(url);
@@ -1056,7 +1062,7 @@ export default class UmiUI {
         }
       });
       ss.installHandlers(server, {
-        prefix: '/umiui',
+        prefix: '/umiui', // 启动socket监听连接
         log: () => {},
       });
       initTerminal.call(this, server);

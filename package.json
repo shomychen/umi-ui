@@ -5,8 +5,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "cross-env DEBUG=umiui* ts-node-dev --no-notify --transpileOnly scripts/dev.ts",
-    "build": "father-build",
+    "dev": "cross-env UMI_PORT=3001 ts-node-dev --notify --transpile-only scripts/dev.ts",
+    "build": "father-build -w",
     "changelog": "lerna-changelog",
     "chore:update-deps": "sh ./scripts/reinstall_deps.sh",
     "clean": "lerna clean -y",
@@ -20,7 +20,7 @@
     "release": "lerna-changelog && node ./scripts/release.js",
     "test": "umi-test",
     "test:coverage": "umi-test --coverage",
-    "ui:build": "node ./scripts/ui.js"
+    "ui:build": "node ./scripts/ui.js -w"
   },
   "lint-staged": {
     "**/*.less": "stylelint --syntax less",

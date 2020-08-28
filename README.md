@@ -1,3 +1,12 @@
+# 本地运行步骤
+
+Step1.安装根目录依赖包及 packages/ui 目录下的依赖包
+
+Step2.打包相关插件：执行 `npm run build -w` 及 `npm run ui:build  -w`
+
+Step3.启动 `npm run dev`
+
+
 # Umi UI
 
 **[Umi](https://github.com/umijs/umi) 研发工作台**，集成一系列可视化辅助编程（VAP）插件，帮助开发者更快更好地开发 Umi 项目。

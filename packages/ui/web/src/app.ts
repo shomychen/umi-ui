@@ -99,7 +99,7 @@ export async function render(oldRender): void {
     return false;
   }
 
-  // Init Socket Connection
+  // Init Socket Connection 初始化sockjs连接
   try {
     await initSocket({
       onMessage({ type, payload }) {
